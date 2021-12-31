@@ -1,4 +1,4 @@
-import {fileListFile, repoListFile, cleanArgs, getArgValue} from "/gitburner/lib.js"
+import { fileListFile, repoListFile, cleanArgs, getArgValue, getCurrentDirectory } from "/gitburner/lib.js"
 
 /** @type {NS} ns */
 let ns
@@ -7,29 +7,41 @@ let ns
 export async function main(ns_) {
     ns = ns_
     let args = cleanArgs(ns.args)
-    if (args < 1) {
+    let currentDir = getCurrentDirectory()
+    if (args < 1 && currentDir == null) {
         ns.tprint("Repository not provided")
-        return
-    }
-    let repoData = args[0].split("/")
-    let author = repoData.at(0)
-    let repo = repoData.at(1)
-    if (author == undefined || repo == undefined) {
-        ns.tprint("Invalid repository")
         return
     }
     let repoList = ns.read(repoListFile)
     /** @type {Object.<string, string>} */
     let repos = {}
     if (repoList != '') repos = JSON.parse(repoList)
+    let repoData = args[0]?.split("/")
+    let author = repoData?.at(0)
+    let repo = repoData?.at(1)
     let branch = getArgValue(ns.args, "main", "branch", "b")
-    let repoKey = args[0] + "@" + branch
-    if(!Object.keys(repos).includes(repoKey)) {
+    if ((author == undefined || repo == undefined) && currentDir != null) {
+        let key = Object.keys(repos).find((p) => repos[p] == currentDir + "/")
+        if(key == undefined) {
+            ns.tprint("Could not find repository at current directory")
+            return
+        }
+        repoData = key.split("@")[1].split("/")
+        author = repoData[0]
+        repo = repoData[1]
+        ns.tprint(author, repo)
+        branch = key.split("@")[0]
+    } else {
+        ns.tprint("Invalid repository")
+        return
+    }
+    let repoKey = branch + "@" + repoData.join("/")
+    if (!Object.keys(repos).includes(repoKey)) {
         ns.tprint(`Could not find ${repoKey}`)
         return
     }
-    ns.print(repoKey)
-    await push({author, repo, branch}, getArgValue(ns.args, undefined, "message", "m"), repos[repoKey])
+    ns.print(`Pushing to ${repoKey}`)
+    await push({ author, repo, branch }, getArgValue(ns.args, undefined, "message", "m"), repos[repoKey])
     // await push({author: "kotakotik22", repo: "BitBurnerGithubTest", branch: "main"})
 }
 
@@ -52,7 +64,7 @@ function apiRequest(path, options = undefined) {
  */
 export async function push(branch, message, path) {
     let updated = 0
-    for(let file of JSON.parse(ns.read((path + fileListFile).replace("//", "/")))) {
+    for (let file of JSON.parse(ns.read((path + fileListFile).replace("//", "/")))) {
         let p = `repos/${branch.author}/${branch.repo}/contents/${file}`
         let response = await (await apiRequest(`${p}?ref=${branch.branch}`)).json()
         let sha = response.sha
@@ -61,7 +73,7 @@ export async function push(branch, message, path) {
         // ns.tprint(btoa(atob(response.content?.trim?.())))
         // continue
         // this is horrible but who cares
-        if(btoa(atob(response.content?.trim?.())) == content) {
+        if (btoa(atob(response.content?.trim?.())) == content) {
             ns.print(`Not updating file ${file} because it has not been changed`)
             continue
         }
