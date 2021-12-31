@@ -6,7 +6,7 @@ export async function main(ns) {
 
 	for (let file of files) {
 		if (!
-			await ns.wget((basePath + file).replace("//", "/"), "gitburner/" + file, "home")
+			await ns.wget((basePath + file).replace("//", "/"), "/gitburner/" + file, "home")
 		) {
 			ns.tprint("Could not download file " + file)
 			return
