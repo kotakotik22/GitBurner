@@ -57,7 +57,11 @@ export async function push(branch, message, path) {
         let response = await (await apiRequest(`${p}?ref=${branch.branch}`)).json()
         let sha = response.sha
         let content = btoa(ns.read((path + file).replace("//", "/"))).trim()
-        if(response.content?.trim?.() == content) {
+        // ns.tprint(content)
+        // ns.tprint(btoa(atob(response.content?.trim?.())))
+        // continue
+        // this is horrible but who cares
+        if(btoa(atob(response.content?.trim?.())) == content) {
             ns.print(`Not updating file ${file} because it has not been changed`)
             continue
         }
