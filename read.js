@@ -1,4 +1,4 @@
-import { fileListFile, cleanArgs, repoListFile, getArgValue } from "/gitburner/lib.js"
+import { fileListFile, cleanArgs, repoListFile, getArgValue, getCurrentDirectory } from "/gitburner/lib.js"
 
 /** @type {NS} ns */
 let ns
@@ -25,16 +25,20 @@ export async function main(ns_) {
     // let branchIndex = ns.args.findIndex((a) => a == "-b" || a == "--branch")
     // let branch = (branchIndex == -1) ? "main" : ns.args[branchIndex + 1]
     let branch = getArgValue(ns.args, "main", "branch", "b")
-    let repoKey = args[0] + "@" + branch
+    let repoKey = branch + "@" + args[0]
     let path = ""
     if (Object.keys(repos).includes(repoKey)) {
         path = repos[repoKey]
     } else {
-        path = ("/" + args.at(1) + "/").replace("//", "/")
-        if (path == undefined) {
+        let path = args.at(1)
+        let currentDir = getCurrentDirectory()
+        if (path == undefined && currentDir != null) {
+            path = currentDir
+        } else {
             ns.tprint("No path provided")
             return
         }
+        path = ("/" + path + "/").replace("//", "/")
         // await downloadFiles({author: "kotakotik22", repo: "BitBurnerGithubTest", branch: "main"})\
         repos[repoKey] = path
         await ns.write(repoListFile, JSON.stringify(repos), "w")
