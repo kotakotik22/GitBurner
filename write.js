@@ -29,7 +29,6 @@ export async function main(ns_) {
         repoData = key.split("@")[1].split("/")
         author = repoData[0]
         repo = repoData[1]
-        ns.tprint(author, repo)
         branch = key.split("@")[0]
     } else {
         ns.tprint("Invalid repository")
@@ -63,35 +62,61 @@ function apiRequest(path, options = undefined) {
  * @return {Promise<object>}
  */
 export async function push(branch, message, path) {
-    let updated = 0
+    let tree = []
+    let auth = new Headers({
+                "Authorization": `token ${localStorage.gitburner_github_token}`
+            })
     for (let file of JSON.parse(ns.read((path + fileListFile).replace("//", "/")))) {
         let p = `repos/${branch.author}/${branch.repo}/contents/${file}`
         let response = await (await apiRequest(`${p}?ref=${branch.branch}`)).json()
-        let sha = response.sha
-        let content = btoa(ns.read((path + file).replace("//", "/"))).trim()
-        // ns.tprint(content)
-        // ns.tprint(btoa(atob(response.content?.trim?.())))
-        // continue
-        // this is horrible but who cares
-        if (btoa(atob(response.content?.trim?.())) == content) {
+        let content = btoa(ns.read((path + file).replace("//", "/")).trim())
+        // so much redundad atob/btoa but im lazy so idc c:
+        if (response.content != null && atob(response.content.trim()) == atob(content)) {
             ns.print(`Not updating file ${file} because it has not been changed`)
             continue
         }
-        let uResponse = await apiRequest(p, {
-            method: "PUT",
-            body: JSON.stringify({
-                sha,
-                branch: branch.branch,
-                message: (message == undefined ? "" : `${message} - `) + "update " + file + "\n\nAutomatically committed by GitBurner",
-                content
-            }),
-            headers: new Headers({
-                "Authorization": `token ${localStorage.gitburner_github_token}`
-            })
+        tree.push({
+            path: file,
+            mode: "100644",
+            type: "blob",
+            content: atob(content)
         })
-        updated++
-        ns.print("Result of updating file " + file + ": " + await uResponse.text())
     }
-    ns.tprint(`Done! Updated ${updated} files`)
+    if(tree.length < 1) {
+        ns.tprint("No files were updated")
+        return
+    }
+    let latestCommit = (await (await apiRequest(`repos/${branch.author}/${branch.repo}/git/ref/heads/${branch.branch}`)).json())
+    let newTree = await (await apiRequest(`repos/${branch.author}/${branch.repo}/git/trees`, {
+        method: "POST",
+        body: JSON.stringify({
+            tree,
+            base_tree: latestCommit.object.sha
+        }),
+        headers: auth
+    })).json()
+    let commit = await apiRequest(`repos/${branch.author}/${branch.repo}/git/commits`, {
+        method: "POST",
+        body: JSON.stringify({
+            message: (message == null ? `Update ${tree.length} files` : message) + "\n\nAutomatically committed by GitBurner",
+            tree: newTree.sha,
+            parents: [latestCommit.object.sha]
+        }),
+        headers: auth
+    })
+    let commitResp = await commit.text()
+    let push = await apiRequest(`repos/${branch.author}/${branch.repo}/git/refs/heads/${branch.branch}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+            sha: JSON.parse(commitResp).sha
+        }),
+        headers: auth
+    })
+    if(push.status == 200) {
+        ns.tprint(`Done! Updated ${tree.length} files`)
+        ns.print(commitResp)
+    } else {
+        ns.tprint("Push unsuccessful \nStatus code: " + push.status + "\nResponse: " + await push.text())
+    }
     // TODO: delete files that have been deleted locally
 }

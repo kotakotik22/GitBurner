@@ -1,11 +1,6 @@
 export const fileListFile = "files.txt"
 export const repoListFile = "/gitburner/repos.txt"
 
-/**
- * Represents a branch on a specific repo
- * @typedef {{author: string, repo: string, branch: string}} Branch
- */
-
 /** 
  * @param {(string|number)[]} args
  * @return {(string|number)[]}
@@ -44,3 +39,8 @@ export function getArgValue(args, defaultt, name, char) {
 export function getCurrentDirectory() {
 	return eval("document").querySelector('.MuiFormControl-root p')?.innerText?.match?.(/~(.*)\]/)?.[1]
 }
+
+/**
+ * Represents a branch on a specific repo
+ * @typedef {{author: string, repo: string, branch: string}} Branch
+ */
