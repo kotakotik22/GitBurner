@@ -36,3 +36,11 @@ export function getArgValue(args, defaultt, name, char) {
 	let index = args.findIndex((a) => a == `-${char}` || a == `--${name}`)
    	return (index == -1) ? defaultt : args[index + 1]
 }
+
+// thanks phil
+/**
+ * @return {string?}
+ */
+export function getCurrentDirectory() {
+	return eval("document").querySelector('.MuiFormControl-root p')?.innerText?.match?.(/~(.*)\]/)?.[1]
+}
