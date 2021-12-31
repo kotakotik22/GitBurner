@@ -41,6 +41,22 @@ export function getCurrentDirectory() {
 }
 
 /**
+ * @param {NS} ns
+ * @param {string} path
+ * @param {string} file
+ */
+export async function addToFileList(ns, path, file) {
+	if(!path.endsWith(fileListFile)) path += fileListFile
+	/** @type {string[]} */
+	let files = []
+	if(ns.fileExists(path)) files = JSON.parse(ns.read(path))
+	if(!files.includes(file)) {
+		files.push(file)
+		await ns.write(path, JSON.stringify(files), "w")
+	}
+}
+
+/**
  * Represents a branch on a specific repo
  * @typedef {{author: string, repo: string, branch: string}} Branch
  */
