@@ -71,4 +71,38 @@ If you have no token set, the push operation will automatically print instructio
 * Reading GitHub projects is cached to 5 minutes, so pushing two commits withing 5 minutes of each other might break things
 
 # Usage:
-TODO
+
+### Clone repo:
+```
+github get [repo owner]/[repo name] [path]
+```
+Path is optional, if omitted, it will find current
+
+Example:
+```
+github get kotakotik22/BitBurnerGithubTest
+```
+### Pull from GitHub
+```
+github get [repo owner]/[repo name]
+```
+Repo information is optional, if omitted, it will find the repo name of the directory you are currently in
+
+If repo information is provided, it will ignore where you currently are and update where the matching repo is
+
+**THIS WILL OVERWRITE ANY CHANGES YOU MADE SINCE THE LAST PULL!!**
+
+Example:
+```
+github get
+```
+### Push to GitHub
+```
+github push [repo owner]/[repo name]
+```
+Just like pulling from GitHub, the repo information is optional
+
+Example:
+```
+github push
+```
