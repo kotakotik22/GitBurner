@@ -1,4 +1,4 @@
-import { fileListFile, repoListFile, cleanArgs, getArgValue, getCurrentDirectory } from "/gitburner/lib.js"
+import { fileListFile, repoListFile, cleanArgs, getArgValue, getCurrentDirectory, getTokenOrAuth } from "/gitburner/lib.js"
 
 /** @type {NS} ns */
 let ns
@@ -59,12 +59,18 @@ function apiRequest(path, options = undefined) {
  * @param {Branch} branch
  * @param {string?} message
  * @param {string} path
- * @return {Promise<object>}
  */
 export async function push(branch, message, path) {
+    // TODO: split up into multiple functions
     let tree = []
+    let token = await getTokenOrAuth(ns)
+    if(token == null) {
+        ns.tprint("Could not get token!")
+        return 
+    }
     let auth = new Headers({
-                "Authorization": `token ${localStorage.gitburner_github_token}`
+                // "Authorization": `token ${localStorage.gitburner_github_token}`
+                "Authorization": token
             })
     for (let file of JSON.parse(ns.read((path + fileListFile).replace("//", "/")))) {
         let p = `repos/${branch.author}/${branch.repo}/contents/${file}`

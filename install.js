@@ -1,8 +1,8 @@
-let basePath = "https:///raw.githubusercontent.com/kotakotik22/GitBurner/main/"
+let basePath = "https://raw.githubusercontent.com/kotakotik22/GitBurner/main/"
 
 /** @param {NS} ns **/
 export async function main(ns) {
-	let files = JSON.parse(await (await fetch(basePath.replace("//", "/") + "files.txt")).text())
+	let files = JSON.parse(await (await fetch(basePath + "files.txt")).text())
 
 	for (let file of files) {
 		if (!
@@ -10,8 +10,6 @@ export async function main(ns) {
 		) {
 			ns.tprint("Could not download file " + file)
 			return
-		} else {
-			ns.tprint("Downloaded " + file)
 		}
 	}
 }
