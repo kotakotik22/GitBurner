@@ -72,7 +72,7 @@ If you have no token set, the push operation will automatically print instructio
 
 # Usage:
 
-### Clone repo:
+### Clone repo
 ```
 github get [repo owner]/[repo name] [path]
 ```
