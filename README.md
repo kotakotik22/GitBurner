@@ -120,3 +120,9 @@ run /gitburner/resettoken.js
 ```
 ### Folder & branch link
 Folders are linked to repo branches in ``/gitburner/repos.txt``, if you want to unlink one, you currently have to manually edit that file.
+### File list
+Every repo has a ``files.txt``, this is the list of files that should be synced between GitHub and BitBurner, you'll have to manually add every file you want to be synced if you made them before creating the repo, but if you are making files after, you can use a command:
+```
+github touch [file name]
+```
+If the file name doesn't end in an accepted file format (.txt, .script, .js), a .txt will automatically be added to it
