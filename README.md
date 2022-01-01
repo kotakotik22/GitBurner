@@ -98,11 +98,24 @@ github get
 ```
 ### Push to GitHub
 ```
-github push [repo owner]/[repo name]
+github push [repo owner]/[repo name] -m "[message]"
 ```
 Just like pulling from GitHub, the repo information is optional
+
+Message is also optional
 
 Example:
 ```
 github push
 ```
+### Changing PATs
+To change your PAT:
+```
+run /gitburner/settoken.js [token]
+```
+To reset it:
+```
+run /gitburner/resettoken.js
+```
+### Folder & branch link
+Folders are linked to repo branches in ``/gitburner/repos.txt``, if you want to unlink one, you currently have to manually edit that file.
