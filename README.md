@@ -1,4 +1,5 @@
 # GitBurner
+###### yeah, very original name, i know
 A BitBurner app to fetch/push GitHub code
 
 <details>
