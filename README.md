@@ -22,9 +22,10 @@ Add alias
 alias github="run /gitburner/github.js"
 ```
 <details>
-  <summary>If you want to be able to push to repositories</summary>
+  <summary>If you want to be able to push to repositories using PAT's (check the 'Pushing' section below)</summary>
   
-  If you want to be able to push, you need to use a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with public repo enabled
+  If you want to be able to push, you need to use a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) 
+  with public repo enabled
   
   This token is saved in the localstorage so it's not encoded into exported saves, but beware it's still not the most safe place to store tokens (it can be accessed by any script you run, for example)
   
@@ -34,9 +35,40 @@ alias github="run /gitburner/github.js"
 </details>
 Done!
 
+# Pushing:
+To push, you need to log into your GitHub account, you can do this two ways:
+
+## PAT's
+[Personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+allow you to create a token that will be used by this app
+
+Check the installations section for info on how to setup one
+
+### **BUT BEWARE, THIS CAN BE UNSAFE**
+
+The PAT is saved in LocalStorage, so it's not saved in a BitBurner file (so it's not encoded into exported saves), but any script can still access them
+
+And there is no way to limit the repositories a PAT can modify, so if someone finds this token, they can modify any repository you can modify
+
+## Temporary app auth
+You can also temporarily authenticate, the login is not saved anywhere so it's saved than the above way, but you'll have to login for every push you make
+
+If you have no token set, the push operation will automatically print instructions:
+
+```
+	Install the GitBurner app: (you only have to do this once per account)
+	   https://github.com/apps/gitburner-bitburner
+
+	To authenticate, go to:
+	   https://github.com/login/device
+	And enter the code
+	   XXXX-XXXX
+	We will automatically proceed once you have accepted
+```
+
 # Notes:
-* Tokens are saved in localstorage, while this is safer than storing them in a txt bitburner file, it's still not the safest since it can be accessed by any script you run
 * I haven't tested this with conflicts yet
+* Reading GitHub projects is cached to 5 minutes, so pushing two commits withing 5 minutes of each other might break things
 
 # Usage:
-TODO :)
+TODO
